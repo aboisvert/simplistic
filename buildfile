@@ -4,6 +4,7 @@ VERSION_NUMBER = "1.0.21-SNAPSHOT"
 
 repositories.remote << "http://www.ibiblio.org/maven2/"
 repositories.remote << "http://repo1.maven.org/maven2/"
+repositories.remote << "http://repo.joist.ws/" # fakesdb
 
 HTTPCLIENT = 'org.apache.httpcomponents:httpclient:jar:4.2.1'
 HTTPCORE = 'org.apache.httpcomponents:httpcore:jar:4.2.1'
@@ -19,7 +20,7 @@ SLF4J = [
 ]
 LOG4J = "log4j:log4j:jar:1.2.15"
 
-FAKESDB = "com.bizo:fakesdb-testing_2.10.0:jar:2.6.2"
+FAKESDB = "com.bizo:fakesdb-testing_2.10:jar:2.7.1"
 
 #download(artifact(FAKESDB) => 'https://github.com/downloads/stephenh/fakesdb/fakesdb-testing_2.9.1-2.6.1.jar')
 
