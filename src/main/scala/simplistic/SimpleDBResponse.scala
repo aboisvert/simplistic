@@ -16,152 +16,15 @@ package simplistic
 
 import scala.xml._
 import XMLFields._
-import SimpleDBReader._
 
 class Errors(xml: NodeSeq) {
   val error = new Error(node("Error", xml))
-}
-
-object Error {
-  /** Extractor so we can pattern match errors **/
-  def unapply(xml: NodeSeq): Option[(String, String, Option[Double])] = {
-      val element = node("Errors", xml)
-      if (element.length > 0) {
-        val error = (new Errors(element)).error
-        Some((error.code, error.message, error.boxUsage))
-      } else None
-  }
 }
 
 class Error(xml: NodeSeq) {
   val code = string("Code", xml)
   val message = string("Message", xml)
   val boxUsage = optionalDouble("BoxUsage", xml)
-}
-
-class SimpleDBResponse(xml: NodeSeq) {
-  val metadata = readMetadata(xml)
-}
-
-class CreateDomainResponse(xml: NodeSeq) extends SimpleDBResponse(xml)
-
-class DeleteDomainResponse(xml: NodeSeq) extends SimpleDBResponse(xml)
-
-class ListDomainsResponse(xml: NodeSeq) extends SimpleDBResponse(xml) {
-  val result = new ListDomainsResult(node("ListDomainsResult", xml))
-}
-
-class DomainMetadataResponse(xml: NodeSeq) extends SimpleDBResponse(xml) {
-  val result = new DomainMetadataResult(node("DomainMetadataResult", xml))
-}
-
-class PutAttributesResponse(xml: NodeSeq) extends SimpleDBResponse(xml)
-
-class BatchPutAttributesResponse(xml: NodeSeq) extends SimpleDBResponse(xml)
-
-class DeleteAttributesResponse(xml: NodeSeq) extends SimpleDBResponse(xml)
-
-class GetAttributesResponse(xml: NodeSeq) extends SimpleDBResponse(xml) {
-  val result = new GetAttributesResult(node("GetAttributesResult", xml))
-}
-
-class QueryResponse(xml: NodeSeq) extends SimpleDBResponse(xml) {
-  val result = new QueryResult(node("QueryResult", xml))
-}
-
-class QueryWithAttributesResponse(xml: NodeSeq) extends SimpleDBResponse(xml) {
-  val result = new QueryWithAttributesResult(node("QueryWithAttributesResult", xml))
-}
-
-abstract class ItemWithAttributesResult(xml: NodeSeq) {
-  class Item(xml: NodeSeq) {
-    import Format._
-    val name = string("Name", xml)
-    val attributes = readAttributes(xml)
-    override def toString = name + "\n" + ("-" * name.length) + "\n" + formatAttributes(attributes)
-  }
-
-  val nextToken = optionalString("NextToken", xml)
-  val items = nodes("Item", xml) map (new Item(_))
-  override def toString = items mkString "\n\n"
-}
-
-class QueryResult(xml: NodeSeq) {
-  val itemNames = strings("ItemName", xml)
-  val nextToken = optionalString("NextToken", xml)
-  override def toString = itemNames mkString ", "
-}
-
-class QueryWithAttributesResult(xml: NodeSeq) extends ItemWithAttributesResult(xml)
-
-class SelectResult(xml: NodeSeq) extends ItemWithAttributesResult(xml)
-
-class SelectResponse(xml: NodeSeq) extends SimpleDBResponse(xml) {
-  val result = new QueryWithAttributesResult(node("SelectResult", xml))
-}
-
-class GetAttributesResult(xml: NodeSeq) {
-  import Format._
-  val attributes = readAttributes(xml)
-  override def toString = formatAttributes(attributes)
-}
-
-class ListDomainsResult(xml: NodeSeq) {
-  val domainNames = strings("DomainName", xml)
-  val nextToken = optionalString("NextToken", xml)
-  override def toString = domainNames mkString ("\n")
-}
-
-class DomainMetadataResult(xml: NodeSeq) {
-
-  // oddly this field is listed in the documentation
-  // but isn't in the real responses
-  // val creation = dateField("CreationDateTime")
-
-  val itemCount = int("ItemCount", xml)
-  val itemNameSizeBytes = int("ItemNamesSizeBytes", xml)
-  val attributeNameCount = int("AttributeNameCount", xml)
-  val attributeNameSizeBytes = int("AttributeNamesSizeBytes", xml)
-  val attributeValueCount = int("AttributeValueCount", xml)
-  val attributeValueSizeBytes = int("AttributeValuesSizeBytes", xml)
-  val timestamp = int("Timestamp", xml)
-
-  override def toString = List(
-    //"created: " + creation,
-    "items: " + itemCount,
-    "item names in bytes: " + itemNameSizeBytes,
-    "attibute names: " + attributeNameCount,
-    "attibute names in bytes: " + attributeNameSizeBytes,
-    "attribute value count: " + attributeValueCount,
-    "attribute value size in bytes: " + attributeValueSizeBytes,
-    "timestamp: " + timestamp
-  ) mkString ("\n")
-}
-
-class ResponseMetadata(xml: NodeSeq) {
-  val requestId = string("RequestId", xml)
-  val boxUsage = optionalDouble("BoxUsage", xml) getOrElse 0.0d
-  override def toString = "Box Usage: " + boxUsage + "s" + " request id: " + requestId
-}
-
-/**
- * Functions for decomposing simpleDB specific types.
- */
-object SimpleDBReader {
-  def readMetadata(xml: NodeSeq) = new ResponseMetadata(node("ResponseMetadata", xml))
-
-  def readAttributes(xml: NodeSeq): Map[String, Set[String]] = {
-    var found = Map[String,Set[String]]()
-
-    def add(name: String, value: String) {
-      found = found updated (name, (found getOrElse(name, Set())) + value)
-    }
-
-    for (node <- nodes("Attribute", xml))
-      add(string("Name", node), string("Value", node))
-
-    found
-  }
 }
 
 object Format {

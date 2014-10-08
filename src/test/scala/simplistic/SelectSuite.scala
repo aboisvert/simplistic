@@ -53,7 +53,7 @@ class SelectSuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefore
 
     "range select expression" in {
       setupData(testDomain)
-      (testDomain select (visits > 16 and visits < 50) map (user(_))).head should be === "jon"
+      (testDomain select (visits > 16 and visits < 50) map (user(_))).next should be === "jon"
     }
 
     "range select with sorting" in {
@@ -73,7 +73,8 @@ class SelectSuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefore
       addItem("b")
       addItem("c")
 
-      (testDomain.items map {(item) => attr(item.attributes)}).toSet should be === Set("a", "b", "c")
+      val items = testDomain.items map { item => attr(item.item.attributes)}
+      items.toSet should be === Set("a", "b", "c")
     }
   }
 }

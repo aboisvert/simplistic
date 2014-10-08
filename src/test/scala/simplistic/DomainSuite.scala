@@ -13,13 +13,13 @@ class DomainSuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefore
 
     "create a domain" in {
       testDomain.create()
-      account.domains.map(_.name) should be === Seq("test")
+      account.domains.map(_.name).to[Seq] should be === Seq("test")
     }
 
     "be idempotent" in {
       testDomain.create()
       testDomain.create()
-      account.domains.map(_.name) should be === Seq("test")
+      account.domains.map(_.name).to[Seq] should be === Seq("test")
     }
 
     "create different domains" in {
@@ -37,16 +37,6 @@ class DomainSuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefore
       account.domains.map(_.name).toSet should be === Set("test")
       testDomain.delete()
       account.domains.map(_.name).toSet should be === Set.empty
-    }
-  }
-
-  "Domain.metadata" should {
-
-    "return metadata about a domain" in {
-      testDomain.create()
-      val meta = testDomain.metadata
-      meta.itemCount should be === 0
-      meta.attributeNameCount should be === 0
     }
   }
 

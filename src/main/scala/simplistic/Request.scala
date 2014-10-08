@@ -146,7 +146,7 @@ object Request {
   /**
    * Case classes for the various operations possible on attributes.
    */
-  abstract class AttributeOperation {
+  sealed trait AttributeOperation {
     def item: String
     def name: String
     def value: String

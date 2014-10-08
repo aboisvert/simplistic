@@ -143,15 +143,17 @@ object Select {
 
     val itemName = "itemName() "
 
-    def select(a: Attribute[_]*)(e: FromExpression)(implicit consistency: Consistency): Stream[ItemSnapshot] = {
+    def select(a: Attribute[_]*)(e: FromExpression)(implicit consistency: Consistency): Iterator[ItemSnapshot] = {
       d.api.select(names(a: _*) + from(d) + whereClause(e), d)
     }
 
-    def select(e: FromExpression)(implicit consistency: Consistency): Stream[ItemSnapshot] =
+    def select(e: FromExpression)(implicit consistency: Consistency): Iterator[ItemSnapshot] =
       d.api.select(all + from(d) + whereClause(e), d)
 
-    def first(expression: LimitableExpression)(implicit consistency: Consistency): Option[ItemSnapshot] =
-      select(expression limit 1).headOption
+    def first(expression: LimitableExpression)(implicit consistency: Consistency): Option[ItemSnapshot] = {
+      val iter = select(expression limit 1)
+      if (iter.hasNext) Some(iter.next) else None
+    }
 
     /**
      * Return the integer count of items within the domain that match the supplied expression.
@@ -163,20 +165,20 @@ object Select {
      * Return a stream of items matching the supplied expression.  These are items without
      * attributes associated with then.
      */
-    def items(e: Expression)(implicit consistency: Consistency): Stream[Item] =
+    def items(e: Expression)(implicit consistency: Consistency): Iterator[Item] =
       d.api.items(itemName + from(d) + whereClause(e), d)
 
     def count(implicit consistency: Consistency): Int = count(EmptyExpression)
   }
 
   class SourceSelection(attributes: AttributeSelection, d: Domain, consistency: Consistency) {
-    def where(e: FromExpression): Stream[ItemSnapshot] = {
+    def where(e: FromExpression): Iterator[ItemSnapshot] = {
       d.api.select(attributes.queryString + from(d) + whereClause(e), d)(consistency)
     }
   }
 
   class CountSource(api: SimpleAPI, d: Domain, consistency: Consistency) {
-    private val countValue = multiValued("Count", PositiveInt)
+    private val countValue = multiValued[Int]("Count", PositiveInt)
 
     val toCount = "count(*) "
 

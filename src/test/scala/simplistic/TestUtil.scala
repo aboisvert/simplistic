@@ -5,14 +5,17 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.Suite
 import fakesdb.Jetty
 import simplistic._
+import com.amazonaws.services.simpledb._
+import com.amazonaws.auth.BasicAWSCredentials
 
 object TestUtil {
   val jetty = Jetty.apply(8181)
 
-  val account = new SimpleDBAccount("foo", "bar", "http://localhost:8181/", new ClientConfiguration {
-    override val maxErrorRetry = 3
-  })
-  // account.connection.trace = true
+  val creds = new BasicAWSCredentials("accessKey", "secretKey")
+  val sdb = new AmazonSimpleDBClient(creds)
+  sdb.setEndpoint("http://localhost:8181/")
+
+  val account = new SimpleAPI(sdb)
 
   def flush() {
     account.domain("_flush").create

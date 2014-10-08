@@ -1,6 +1,8 @@
 package simplistic
 
 import Conversions._
+import com.amazonaws.services.simpledb
+import scala.collection._
 
 object Attributes {
 
@@ -29,6 +31,9 @@ object Attributes {
     def apply(result: scala.collection.Map[String, Set[String]]): List[T] =
       if (! result.contains(name)) List.empty
       else result(name).toList flatMap conversion.unapply
+
+    def apply(result: java.util.List[simpledb.model.Attribute]): List[T] = apply(Utils.attrsToMap(result))
+
   }
 
   trait SingleValuedAttribute[T] extends Attribute[T] {
@@ -70,7 +75,6 @@ object Attributes {
 
   /** Create a typed attribute with an associated conversion to and from that type. */
   def multiValued[T](name: String, conversion: Conversion[T]) = MultiValuedAttribute[T](name, conversion)
-
 
   /** Create an optional attribute that's not multi-valued */
   def optionalAttribute(name: String) = OptionalSingleValuedAttribute(name, Conversions.PassThrough)

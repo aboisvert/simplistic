@@ -18,16 +18,20 @@ package simplistic
 
 sealed trait Consistency {
   def orElse(c: Consistency): Consistency
+  def isConsistent: Boolean
 }
 
 case object UnspecifiedConsistency extends Consistency {
-  def orElse(c: Consistency) = c
+  override def orElse(c: Consistency) = c
+  override def isConsistent = false
 }
 
 case object EventuallyConsistent extends Consistency {
   def orElse(c: Consistency) = this
+  override def isConsistent = false
 }
 
 case object ConsistentRead extends Consistency {
   def orElse(c: Consistency) = this
+  override def isConsistent = true
 }
