@@ -17,7 +17,6 @@ package simplistic
 
 import Request.{AttributeOperation, AddValue, ReplaceValue}
 
-
 import com.amazonaws.services.simpledb.AmazonSimpleDB
 import com.amazonaws.services.simpledb.model._
 import com.amazonaws.services.simpledb
@@ -112,8 +111,8 @@ class Domain(val name: String)(implicit val sdb: AmazonSimpleDB) {
    * This the exact analog of using the 'Query' request without specifying a query
    * expression.
    */
-  def items(implicit consistency: Consistency): Iterator[ItemSnapshot] = {
-    api.select("itemName() from `%s`".format(name), this)
+  def items(implicit consistency: Consistency): Iterator[Item] = {
+    api.items("itemName() from `%s`".format(name), this)
   }
 
   /**
@@ -317,7 +316,6 @@ class Item(val domain: Domain, val name: String)(implicit val sdb: AmazonSimpleD
       .withAttributes(attrs: _*)
       .withExpected(condition)
     )
-
   }
 
   /** Add a single value to an attribute of this item. */

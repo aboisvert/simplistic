@@ -73,7 +73,7 @@ class SelectSuite extends WordSpec with ShouldMatchers with TestUtil.CleanBefore
       addItem("b")
       addItem("c")
 
-      val items = testDomain.items map { item => attr(item.item.attributes)}
+      val items = testDomain.items map { item => attr(item.attributes)}
       items.toSet should be === Set("a", "b", "c")
     }
   }
