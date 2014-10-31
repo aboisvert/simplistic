@@ -32,6 +32,24 @@ object Conversions {
     }
   }
 
+  object IntConversion extends Conversion[Int] {
+    override def apply(number: Int) = number.toString
+    override def unapply(string: String): Option[Int] = string match {
+      case null => None
+      case "" => None
+      case intString => Some(java.lang.Integer.parseInt(intString))
+    }
+  }
+
+  object LongConversion extends Conversion[Long] {
+    override def apply(number: Long) = number.toString
+    override def unapply(string: String): Option[Long] = string match {
+      case null => None
+      case "" => None
+      case intString => Some(java.lang.Long.parseLong(intString))
+    }
+  }
+  
   /**
    * Conversion for dates using a lexicographically comparable format specified by ISO8601.
    * @see http://en.wikipedia.org/wiki/ISO_8601
