@@ -1,0 +1,28 @@
+<ivy-module version="1.1">
+
+  <info organisation="simplistic" module="simplistic_2.10"/>
+
+  <configurations>
+    <conf name="default" description="default configuration that 'by default' pulls in the global configuration"/>
+    <conf name="compile" visibility="private" description="additional dependencies needed only at build"/>
+    <conf name="test" visibility="private" description="additional dependencies needed only at test"/>
+    <conf name="sources" description="source artifacts"/>
+  </configurations>
+  <publications>
+    <artifact conf="default"/>
+    <artifact name="${ivy.module}-src" type="source" ext="zip" conf="sources"/>    
+  </publications>
+
+  <dependencies defaultconf="default->default;sources->sources()">
+    <!-- global (compile, test, runtime) dependencies -->
+    <dependency org="bizo.com" name="aws-java-sdk-all" rev="latest.integration" conf="default->default;sources->sources()"/>
+
+    <!-- compile -->
+    <dependency org="bizo.com" name="scala-all_2.10" rev="latest.integration" conf="default->default,library,scalap;sources->sources();compile->compiler;test->scalatest"/>
+    
+      <!-- test -->
+    <dependency org="com.bizo" name="fakesdb_2.10" rev="2.7.1" conf="test->default"/>
+    <dependency org="bizo.com" name="jtty" rev="1.5" conf="test->default"/>
+    <dependency org="junit" name="junit" rev="4.8.2" conf="test->default"/>
+  </dependencies>
+</ivy-module>
